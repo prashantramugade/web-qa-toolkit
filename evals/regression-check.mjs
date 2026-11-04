@@ -28,7 +28,8 @@ try {
   const cases = JSON.parse(fs.readFileSync(path.join(root, 'evals', 'cases.json'), 'utf8'));
   let bad = 0;
   for (const e of cases.expected) {
-    if (!findings.some(f => f.summary.includes(e))) { console.log(`MISSING     ${e}`); bad++; }
+    const options = Array.isArray(e) ? e : [e];
+    if (!findings.some(f => options.some(o => f.summary.includes(o)))) { console.log(`MISSING     ${options.join('  OR  ')}`); bad++; }
   }
   for (const n of cases.notExpected ?? []) {
     if (findings.some(f => f.page.includes(n))) { console.log(`UNEXPECTED  finding on ${n}`); bad++; }

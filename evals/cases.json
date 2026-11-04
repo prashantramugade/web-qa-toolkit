@@ -1,5 +1,5 @@
 {
-  "description": "Defects seeded in demo-app. Each text must appear in the summary of an automatic finding.",
+  "description": "Defects seeded in demo-app. Each entry must appear in the summary of an automatic finding. An array means any one wording is accepted (fallback checks when axe is missing, axe rule ids when it is installed).",
   "expected": [
     "Server answered HTTP 404",
     "console error",
@@ -9,9 +9,20 @@
     "No viewport meta tag",
     "No meta description",
     "Expected one <h1>, found 2",
-    "image(s) without alt attribute",
-    "input(s) without an accessible label",
-    "button(s) without an accessible name"
+    [
+      "image(s) without alt attribute",
+      "(image-alt"
+    ],
+    [
+      "input(s) without an accessible label",
+      "(label,"
+    ],
+    [
+      "button(s) without an accessible name",
+      "(button-name"
+    ]
   ],
-  "notExpected": ["about.html"]
+  "notExpected": [
+    "about.html"
+  ]
 }
