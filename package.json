@@ -1,0 +1,17 @@
+{
+  "name": "web-qa-toolkit",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "npm install && npx playwright install chromium",
+    "crawl": "node scripts/crawl.mjs",
+    "report": "node scripts/report.mjs",
+    "suite": "npx playwright test -c suite"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
