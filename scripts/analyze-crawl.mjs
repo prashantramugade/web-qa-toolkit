@@ -33,9 +33,11 @@ for (const p of map.pages) {
     if (d.inputsNoLabel) add('medium', 'accessibility', url, `${d.inputsNoLabel} input(s) without an accessible label`);
     if (d.buttonsNoName) add('medium', 'accessibility', url, `${d.buttonsNoName} button(s) without an accessible name`);
   }
-  if (!d.lang) add('medium', 'accessibility', url, 'Page language not declared (<html lang>)');
+  if (p.axeSkipped && !d.lang) add('medium', 'accessibility', url, 'Page language not declared (<html lang>)'); // axe reports this itself when it runs
 
-  if (p.consoleErrors?.length) add('medium', 'functional', url, `${p.consoleErrors.length} console error(s)`, p.consoleErrors.slice(0, 3).join('\n'));
+  // 'Failed to load resource' console lines duplicate the failed-request finding below, so they are left out here
+  const consoleErrors = (p.consoleErrors ?? []).filter(e => !/Failed to load resource/i.test(e));
+  if (consoleErrors.length) add('medium', 'functional', url, `${consoleErrors.length} console error(s)`, consoleErrors.slice(0, 3).join('\n'));
   const failed = (p.failedRequests ?? []).filter(r => !/favicon/i.test(r));
   if (failed.length) add('medium', 'functional', url, `${failed.length} failed or 4xx/5xx request(s)`, failed.slice(0, 5).join('\n'));
 

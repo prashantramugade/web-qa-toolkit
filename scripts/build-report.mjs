@@ -34,20 +34,23 @@ auto = auto.filter(f => {
 // Failed Playwright tests become findings (walk the JSON reporter tree)
 const suiteFindings = [];
 if (pwResults && fs.existsSync(pwResults)) {
-  const walk = s => {
+  const ansi = /\u001b\[[0-9;]*m/g; // terminal colour codes in Playwright error text
+  const walk = (s, page = '') => {
     for (const spec of s.specs ?? []) {
       for (const t of spec.tests ?? []) {
         const last = t.results?.[t.results.length - 1];
         if (last && last.status !== 'passed' && last.status !== 'skipped') {
+          const message = (last.error?.message ?? '').replace(ansi, '').split('\n').map(l => l.trimEnd()).filter(Boolean);
           suiteFindings.push({
-            source: 'suite', severity: 'medium', category: 'suite', page: spec.file ?? '',
+            source: 'suite', severity: 'medium', category: 'suite', page: page || spec.file || '',
             summary: `Failed test: ${spec.title} [${t.projectName ?? ''}]`,
-            detail: (last.error?.message ?? '').split('\n').slice(0, 4).join('\n'),
+            detail: message.slice(0, 10).join('\n'),
           });
         }
       }
     }
-    (s.suites ?? []).forEach(walk);
+    // nested describe blocks are titled with the page path (e.g. "/about.html"); the top-level suite is the spec file
+    for (const child of s.suites ?? []) walk(child, /\.(spec\.)?[jt]s$/.test(child.title) ? page : child.title);
   };
   walk(readJson(pwResults, {}));
 }

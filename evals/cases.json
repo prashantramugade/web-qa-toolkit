@@ -5,7 +5,10 @@
     "console error",
     "failed or 4xx/5xx request",
     "Content overflows horizontally at 390px width",
-    "Page language not declared",
+    [
+      "Page language not declared",
+      "(html-has-lang"
+    ],
     "No viewport meta tag",
     "No meta description",
     "Expected one <h1>, found 2",
