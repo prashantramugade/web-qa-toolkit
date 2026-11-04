@@ -60,7 +60,8 @@ try {
   failed++;
 } finally {
   server.kill();
-  fs.rmSync(out, { recursive: true, force: true });
+  // KEEP_E2E_OUT=1 leaves the output folder in place (CI uploads it as an artifact)
+  if (!process.env.KEEP_E2E_OUT) fs.rmSync(out, { recursive: true, force: true });
 }
 console.log(failed ? `\n${failed} check(s) failed` : '\nE2E OK');
 process.exitCode = failed ? 1 : 0;

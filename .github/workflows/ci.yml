@@ -26,3 +26,15 @@ jobs:
         run: npm run check
       - name: End-to-end (crawl, scaffold, run suite, report, package)
         run: npm run e2e
+        env:
+          KEEP_E2E_OUT: '1'
+      - name: Upload results (report, screenshots, generated suite)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-e2e-${{ matrix.os }}
+          path: |
+            qa-out-e2e
+            !qa-out-e2e/suite/node_modules
+          if-no-files-found: warn
+          retention-days: 14
