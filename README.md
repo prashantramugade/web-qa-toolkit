@@ -16,7 +16,7 @@ Needs Node 18+. This installs the dependencies and the Chromium browser.
 
 In Copilot Chat, choose the **site-tester** agent (or type `/test-site`) and give it a URL:
 
-> QA https://staging.example.com
+> QA https://your-staging-site.example
 
 It asks about depth, environment, login and deliverables once, then runs and writes the results to a `qa-out-...` folder (`report.html`, `report.md`, `findings.csv`).
 
