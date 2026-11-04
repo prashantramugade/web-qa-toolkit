@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 
-// Data-driven: one set of checks per page listed in qa.config.json (written by scaffold-suite.sh).
+// Data-driven: one set of checks per page listed in qa.config.json (written by scaffold-suite.mjs).
 // Add app-specific journeys under tests/functional/ (see tests/functional/_template.spec.ts.txt).
 const cfg = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../qa.config.json'), 'utf8')) as {
   baseURL: string; pages: string[]; skipChecks?: string[];
