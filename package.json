@@ -12,7 +12,8 @@
     "setup:installed-browser": "npm install",
     "reachable": "node scripts/check-reachable.mjs",
     "scaffold": "node scripts/scaffold-suite.mjs",
-    "package": "node scripts/package-results.mjs"
+    "package": "node scripts/package-results.mjs",
+    "e2e": "node evals/e2e-check.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
