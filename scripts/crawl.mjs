@@ -24,7 +24,9 @@ const origin = new URL(startUrl).origin;
 const norm = u => { const x = new URL(u, origin); x.hash = ''; return x.href.replace(/\/$/, ''); };
 const slug = u => (new URL(u).pathname.replace(/\W+/g, '_').replace(/^_|_$/g, '') || 'home').slice(0, 60);
 
-const browser = await chromium.launch();
+// Default: Playwright's own Chromium. Set BROWSER_CHANNEL=chrome (or msedge) to use the browser installed on this machine instead.
+const channel = process.env.BROWSER_CHANNEL || undefined;
+const browser = await chromium.launch({ channel });
 const ctx = await browser.newContext({
   viewport: { width: 1280, height: 800 },
   ...(storageState ? { storageState } : {}),

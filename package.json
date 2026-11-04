@@ -8,7 +8,8 @@
     "analyze": "node scripts/analyze-crawl.mjs",
     "overview": "node scripts/site-overview.mjs",
     "report": "node scripts/build-report.mjs",
-    "check": "bash evals/regression-check.sh"
+    "check": "bash evals/regression-check.sh",
+    "setup:installed-browser": "npm install"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

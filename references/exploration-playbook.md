@@ -14,7 +14,7 @@ Primary journeys are the few things a visitor came to do (find a product, sign u
 Put scripts in `<out>/explore/` and run them with `node`. Pattern:
 ```js
 import { chromium } from 'playwright';
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined });
 const page = await (await browser.newContext({ viewport: { width: 1280, height: 800 } })).newPage();
 await page.goto(process.env.URL);
 await page.waitForLoadState('networkidle');

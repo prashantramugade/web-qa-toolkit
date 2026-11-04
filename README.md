@@ -10,7 +10,9 @@ Runs in VS Code with GitHub Copilot agent mode. No MCP server needed.
 npm run setup
 ```
 
-Needs Node 18+. This installs the dependencies and the Chromium browser.
+Needs Node 18+. This installs the dependencies and Playwright's Chromium browser (the default).
+
+**Can't download a browser (e.g. restricted network)?** Use Chrome or Edge already installed on the machine instead: run `npm run setup:installed-browser`, then set `BROWSER_CHANNEL=chrome` (or `msedge`) before crawling or running the suite. Alternatively, point `PLAYWRIGHT_DOWNLOAD_HOST` at an internal mirror.
 
 ## Use
 
