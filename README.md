@@ -22,6 +22,19 @@ In Copilot Chat, choose the **site-tester** agent (or type `/test-site`) and giv
 
 It asks about depth, environment, login and deliverables once, then runs and writes the results to a `qa-out-...` folder (`report.html`, `report.md`, `findings.csv`).
 
+## Playwright test suite (TypeScript)
+
+Choose **report + Playwright suite** when the agent asks about deliverables. It creates a ready-to-run TypeScript project in `qa-out-.../suite/` with smoke, accessibility, responsive, SEO and security tests for every page it found. The agent can also add app-specific journey tests under `tests/functional/`.
+
+To create and run it yourself after a crawl:
+
+```
+bash scripts/scaffold-suite.sh qa-out/suite https://your-staging-site.example qa-out/site-map.json
+cd qa-out/suite && npx playwright test --project=chromium
+```
+
+The suite is plain Playwright Test, so you can copy the folder into any project and run it in CI. Edit `qa.config.json` to change the base URL, add pages or turn checks off.
+
 ## Layout
 
 - `.github/agents/site-tester.agent.md`: the agent (rules and workflow)
