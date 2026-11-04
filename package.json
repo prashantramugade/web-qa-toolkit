@@ -5,8 +5,10 @@
   "scripts": {
     "setup": "npm install && npx playwright install chromium",
     "crawl": "node scripts/crawl.mjs",
-    "report": "node scripts/report.mjs",
-    "suite": "npx playwright test -c suite"
+    "analyze": "node scripts/analyze-crawl.mjs",
+    "overview": "node scripts/site-overview.mjs",
+    "report": "node scripts/build-report.mjs",
+    "check": "bash evals/regression-check.sh"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",

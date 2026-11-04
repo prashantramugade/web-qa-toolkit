@@ -1,0 +1,17 @@
+{
+  "description": "Defects seeded in demo-app. Each text must appear in the summary of an automatic finding.",
+  "expected": [
+    "Server answered HTTP 404",
+    "console error",
+    "failed or 4xx/5xx request",
+    "Content overflows horizontally at 390px width",
+    "Page language not declared",
+    "No viewport meta tag",
+    "No meta description",
+    "Expected one <h1>, found 2",
+    "image(s) without alt attribute",
+    "input(s) without an accessible label",
+    "button(s) without an accessible name"
+  ],
+  "notExpected": ["about.html"]
+}

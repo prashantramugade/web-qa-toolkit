@@ -1,0 +1,12 @@
+// Copy to <journey>.spec.ts, fill in, and delete this template before handing the suite over.
+// Rules: assert what a user should see; a red test means a defect. Use getByRole / getByLabel, never fixed sleeps.
+import { test, expect } from '@playwright/test';
+
+test.describe('Journey: <name>', () => {
+  test('<what the user can do>', async ({ page }) => {
+    test.info().annotations.push({ type: 'finding', description: 'F-xxx (optional link to a report finding)' });
+    await page.goto('/');
+    await page.getByRole('link', { name: '<link text>' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+});

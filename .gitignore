@@ -1,5 +1,5 @@
 node_modules/
-qa-out/
-suite/results/
-suite/test-results/
+qa-out*/
 auth/
+results/
+test-results/
