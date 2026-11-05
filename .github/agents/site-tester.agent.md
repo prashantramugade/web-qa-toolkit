@@ -25,8 +25,9 @@ Paths below are relative to this repository. Every script is Node, so the same c
 | | Quick | Standard | Deep |
 |---|---|---|---|
 | Pages crawled | up to 10 | up to 15 | up to 30 |
+| Automatic exploration (`explore.mjs`) | none | yes: 8 pages | yes: 20 pages, more forms and buttons |
 | Hands-on journeys | none | 2-4 | all, with form matrices |
-| Suite (if asked) | smoke, a11y | + responsive, SEO, functional | + performance, extra browsers |
+| Generated suite (if asked) | same checks, from the crawl | + functional specs from the exploration | + your own journey specs |
 
 ## Steps
 1. **Check the site is reachable:** `node scripts/check-reachable.mjs <url>`. If it fails, explain why (wrong URL, site down, blocked, login wall) and stop.
@@ -38,23 +39,28 @@ Paths below are relative to this repository. Every script is Node, so the same c
    node scripts/site-overview.mjs OUT/site-map.json
    ```
    Read the overview, not the raw JSON. Write `OUT/app-profile.json` (see `references/exploration-playbook.md`).
-4. **Plan (Standard/Deep):** a short `OUT/test-plan.md`: area, risk, approach. Money, identity and data entry first.
-5. **Test by hand (Standard/Deep):** small Playwright scripts in `OUT/explore/`. Walk each main journey, try form validation, keyboard use, widths 390/768/1280, and watch console and network. Log each confirmed defect straight away in `OUT/manual-findings.json` (format: `references/report-format.md`).
+4. **Explore (Standard/Deep):** the exploratory pass. It works like a tester: it submits forms with empty, invalid and awkward input, searches with odd queries, clicks buttons and watches what changes, tabs through the page, and checks back/forward and the 404 page.
+   ```
+   node scripts/explore.mjs --site-map OUT/site-map.json --out OUT --env readonly
+   ```
+   Use `--env readonly` on production: every write request (POST, PUT, PATCH, DELETE) is blocked inside the browser before it leaves, so nothing can be created or sent. Use `--env staging` only when the user said fake data is fine; forms are then really submitted. Forms with a password field are never filled, and anything that looks destructive or like a payment (delete, logout, pay, checkout...) is never used, in either mode. For Deep add `--max-pages 20 --max-forms 5 --max-controls 12`.
+   Read `OUT/exploration-notes.md` and look at the `OUT/screenshots/explore-*.png` files. The automatic anomalies are in `OUT/explore-findings.json`. Findings marked `verify` were not proven (read-only mode cannot see the server's answer): confirm them or leave them marked.
+5. **Plan and test by hand (Standard/Deep):** write a short `OUT/test-plan.md` (area, risk, approach; money, identity and data entry first). Then do what the explorer cannot judge: walk each main journey end to end, check that totals and counters are right, that wording and error messages make sense, and that the right people see the right things. Use small Playwright scripts in `OUT/explore/` (see `references/exploration-playbook.md`). Log each confirmed defect at once in `OUT/manual-findings.json` (format: `references/report-format.md`).
 6. **Suite (only if requested):**
    ```
    node scripts/scaffold-suite.mjs OUT/suite <url> OUT/site-map.json
    npx playwright test -c OUT/suite --project=chromium
    ```
-   Add app-specific specs in `tests/functional/` using role/label locators and no fixed waits. A failing test is a defect: do not weaken it. Fix only your own bad selectors or timing, then run once more.
-7. **Report:** `node scripts/build-report.mjs --out OUT [--pw-results OUT/suite/results/results.json] --title "QA report - <App>"`. Check once that the counts match and no credentials leaked. Optional bundle: `node scripts/package-results.mjs OUT OUT/suite <dest>`.
+   The scaffolder turns what the exploration found into functional specs (forms, search, buttons with quantities, navigation), next to the smoke, accessibility, responsive, SEO, security and performance specs. Tests that submit data are skipped unless `ALLOW_WRITES=1`, and that is only ever set on a test environment. Add journey specs of your own in `tests/functional/` from `_template.spec.ts.txt`: page objects, role/label locators, no fixed waits. A failing test is a defect: do not weaken it. Fix only your own bad selectors or timing, then run once more.
+7. **Report:** `node scripts/build-report.mjs --out OUT [--pw-results OUT/suite/results/results.json] --title "QA report - <App>"`. The report includes a "What was explored" section taken from the exploration log. Check once that the counts match and no credentials leaked. Optional bundle: `node scripts/package-results.mjs OUT OUT/suite <dest>`.
 
 ## Keep it efficient
-Do not read raw crawl JSON, do not take extra screenshots beyond the crawler's, do not re-run the whole suite "to be sure", and stop exploring once each main journey has been walked and each committed category has an outcome.
+Do not read raw crawl JSON, do not take extra screenshots beyond the ones the scripts write, do not re-run the whole suite "to be sure", and stop exploring once each main journey has been walked and each committed category has an outcome.
 
 ## Final message
 One-line verdict, the top three to five findings in a sentence each, counts by severity, what was not covered, where the files are, and the command to re-run the suite if one exists. Do not paste the report.
 
 ## Reference
 - `references/test-categories.md`: checklists, safety limits, severity levels
-- `references/exploration-playbook.md`: understanding the app, scripting, logins, single-page apps
+- `references/exploration-playbook.md`: understanding the app, reading the exploration, scripting, logins, single-page apps
 - `references/report-format.md`: JSON formats and report building

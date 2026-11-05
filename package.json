@@ -4,15 +4,16 @@
   "type": "module",
   "scripts": {
     "setup": "npm install && npx playwright install chromium",
+    "setup:installed-browser": "npm install",
+    "reachable": "node scripts/check-reachable.mjs",
     "crawl": "node scripts/crawl.mjs",
     "analyze": "node scripts/analyze-crawl.mjs",
     "overview": "node scripts/site-overview.mjs",
-    "report": "node scripts/build-report.mjs",
-    "check": "node evals/regression-check.mjs",
-    "setup:installed-browser": "npm install",
-    "reachable": "node scripts/check-reachable.mjs",
+    "explore": "node scripts/explore.mjs",
     "scaffold": "node scripts/scaffold-suite.mjs",
+    "report": "node scripts/build-report.mjs",
     "package": "node scripts/package-results.mjs",
+    "check": "node evals/regression-check.mjs",
     "e2e": "node evals/e2e-check.mjs"
   },
   "devDependencies": {

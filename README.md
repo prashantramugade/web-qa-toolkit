@@ -1,6 +1,6 @@
 # web-qa-toolkit
 
-Point it at a URL and it tests the site like a QA engineer: it crawls, checks accessibility, security headers, responsive layout, SEO and links, and writes a ranked report. It can also generate a Playwright (TypeScript) test suite. It only reads the site, it never changes it.
+Point it at a URL and it tests the site like a QA engineer. It crawls the pages and checks accessibility, security headers, responsive layout, SEO, performance and links. It then **explores** the app the way a tester would: submits forms with empty and invalid input, searches with odd queries, clicks buttons and compares before and after, tabs through the page, and tries Back and Refresh. The result is a ranked report, and optionally a Playwright (TypeScript) test suite built from what the exploration found. It never changes the site, and on production it cannot send anything: every write request is blocked in the browser.
 
 Runs on Windows, macOS and Linux. Everything is Node: no Python, bash or MCP server needed.
 
@@ -13,7 +13,7 @@ npm run setup
 npm run check
 ```
 
-`setup` installs the dependencies and Playwright's Chromium. `check` runs the toolkit against a built-in demo app and should end with `OK: all 11 seeded defects found`.
+`setup` installs the dependencies and Playwright's Chromium. `check` runs the toolkit against a built-in demo shop and should end with `OK:` and the number of seeded defects it found.
 
 ### Restricted network or no browser download
 
@@ -54,16 +54,19 @@ It asks about depth, environment, login and deliverables once, then runs and wri
 node scripts/check-reachable.mjs https://your-staging-site.example
 node scripts/crawl.mjs https://your-staging-site.example --out qa-out --max-pages 15
 node scripts/analyze-crawl.mjs qa-out/site-map.json
+node scripts/explore.mjs --site-map qa-out/site-map.json --out qa-out --env readonly
 node scripts/build-report.mjs --out qa-out --title "QA report"
 ```
 
-Add `--storage-state auth/user.json` to the crawl for logged-in pages.
+Add `--storage-state auth/user.json` to the crawl and the exploration for logged-in pages.
 
-Results in `qa-out/`: `report.html`, `report.md`, `findings.csv`, `findings.json`, and screenshots in `evidence/`.
+**Exploration modes.** `--env readonly` (default) is safe on production: POST, PUT, PATCH and DELETE are blocked before they leave the browser, so nothing is created or sent. Use `--env staging` only on a test environment: forms are then really submitted, with fake data. In both modes it never fills a password field and never uses anything that looks destructive or like a payment.
+
+Results in `qa-out/`: `report.html`, `report.md`, `findings.csv`, `findings.json`, `exploration-notes.md` (what it tried and saw), and screenshots in `screenshots/`.
 
 ## Playwright test suite (TypeScript)
 
-Choose **report + Playwright suite** when the agent asks about deliverables. It creates a ready-to-run project in `qa-out-.../suite/` with smoke, accessibility, responsive, SEO and security tests for every page found. The agent can also add app-specific journey tests under `tests/functional/`.
+Choose **report + Playwright suite** when the agent asks about deliverables. It creates a ready-to-run project in `qa-out-.../suite/`. For every page it has smoke, accessibility, keyboard, responsive, SEO, link, security and performance tests. The **functional tests are generated from the exploration**: each form, search and quantity button it found gets tests that repeat what it tried (empty and invalid submissions, odd search queries, cart arithmetic), plus back/forward and 404 checks. Tests that submit data are skipped unless you set `ALLOW_WRITES=1`, which you should do only against a test environment. The agent can add journey tests of its own under `tests/functional/`, using page objects.
 
 To create and run it yourself after a crawl:
 
@@ -72,6 +75,8 @@ node scripts/scaffold-suite.mjs qa-out/suite https://your-staging-site.example q
 npx playwright test -c qa-out/suite --project=chromium
 ```
 
+To include the tests that submit data (test environments only): `ALLOW_WRITES=1` before the second command (`export ALLOW_WRITES=1` on macOS/Linux, `$env:ALLOW_WRITES = "1"` in PowerShell).
+
 It is plain Playwright Test, so you can copy the folder into any project or CI. Edit `qa.config.json` to change the base URL, add pages or turn checks off.
 
 ## Layout
@@ -79,6 +84,6 @@ It is plain Playwright Test, so you can copy the folder into any project or CI. 
 - `.github/agents/site-tester.agent.md`: the agent (rules and workflow)
 - `.github/prompts/test-site.prompt.md`: the `/test-site` command
 - `references/`: test checklists, exploration playbook, report formats
-- `scripts/`: crawler, analyzer, report builder, suite scaffolder, packaging
-- `assets/suite-template/`: Playwright TypeScript project template
-- `evals/`: demo app with seeded defects, `npm run check` (quick) and `npm run e2e` (full). Run `check` before changing a script.
+- `scripts/`: crawler, analyzer, explorer, report builder, suite scaffolder, packaging
+- `assets/suite-template/`: Playwright TypeScript project template (specs, page objects, helpers)
+- `evals/`: a demo shop with seeded defects, `npm run check` (quick: every seeded defect must be found, and read-only mode must send nothing) and `npm run e2e` (full: crawl, explore, generated suite, report). Run `check` before changing a script.

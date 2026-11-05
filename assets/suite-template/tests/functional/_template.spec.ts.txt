@@ -1,12 +1,49 @@
-// Copy to <journey>.spec.ts, fill in, and delete this template before handing the suite over.
-// Rules: assert what a user should see; a red test means a defect. Use getByRole / getByLabel, never fixed sleeps.
+// TEMPLATE: copy to tests/functional/<feature>.spec.ts (drop the .txt) and adapt. Delete what you do not need.
+//
+// The generated specs next to this file (forms, search, controls, navigation) cover what exploration found.
+// Use this template for journeys only a human can describe: login, checkout, create/edit/delete, permissions.
+//
+// Principles
+//  - One behaviour per test, named after what the USER can do or must not be able to do.
+//  - Assert what a user would observe (text, URL, visible state), not implementation details.
+//  - Locate like a user: getByRole / getByLabel / getByText. If a control can only be reached by placeholder or CSS,
+//    it has no accessible name: that is an accessibility finding, record it.
+//  - No fixed sleeps. Wait on observable conditions: expect(locator).toBeVisible(), page.waitForResponse(...).
+//  - Tests encode EXPECTED behaviour. A failing test is a defect: never weaken it to make it pass.
+//  - Anything that submits data must be guarded: test.skip(!allowWrites, '...') and run with ALLOW_WRITES=1 on a test environment.
 import { test, expect } from '@playwright/test';
+import { BasePage } from '../../pages/BasePage';
+import { allowWrites } from '../../helpers/site';
+import { emailCases, textCases } from '../../helpers/form-data';
 
-test.describe('Journey: <name>', () => {
-  test('<what the user can do>', async ({ page }) => {
-    test.info().annotations.push({ type: 'finding', description: 'F-xxx (optional link to a report finding)' });
-    await page.goto('/');
-    await page.getByRole('link', { name: '<link text>' }).click();
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+// Page object: one class per page or component, holding locators and user actions.
+class ContactPage extends BasePage {
+  readonly path = '/contact';
+  name = this.page.getByLabel('Name');
+  email = this.page.getByLabel('Email');
+  message = this.page.getByLabel('Message');
+  send = this.page.getByRole('button', { name: /send/i });
+  status = this.page.getByRole('status');
+
+  async fillAndSend(values: { name: string; email: string; message: string }) {
+    await this.name.fill(values.name);
+    await this.email.fill(values.email);
+    await this.message.fill(values.message);
+    await this.send.click();
+  }
+}
+
+test.describe('Journey: contact the shop', () => {
+  test('a valid message is confirmed', async ({ page }) => {
+    test.skip(!allowWrites, 'submits data: set ALLOW_WRITES=1 and run against a test environment');
+    test.info().annotations.push({ type: 'finding', description: 'F-xxx (optional: link the test to a report finding)' });
+    const contact = new ContactPage(page);
+    await contact.goto();
+    await contact.fillAndSend({ name: 'QA Tester', email: emailCases.valid[0], message: textCases.unicode });
+    await expect(contact.status).toContainText(/thank|sent|success/i);
   });
 });
+
+// Journeys worth covering per app: login (valid, wrong password, locked, logout, session expiry), create-read-update-delete
+// round trips, search and filters, pagination, cart and checkout arithmetic, permissions (user A cannot open user B's URL),
+// back/forward and refresh state, error pages.

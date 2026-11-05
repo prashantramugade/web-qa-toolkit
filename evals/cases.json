@@ -1,31 +1,42 @@
 {
-  "description": "Defects seeded in demo-app. Each entry must appear in the summary of an automatic finding. An array means any one wording is accepted (fallback checks when axe is missing, axe rule ids when it is installed).",
-  "expected": [
-    "Server answered HTTP 404",
-    "console error",
-    "failed or 4xx/5xx request",
-    "Content overflows horizontally at 390px width",
-    [
-      "Page language not declared",
-      "(html-has-lang"
-    ],
-    "No viewport meta tag",
-    "No meta description",
-    "Expected one <h1>, found 2",
-    [
-      "image(s) without alt attribute",
-      "(image-alt"
-    ],
-    [
-      "input(s) without an accessible label",
-      "(label,"
-    ],
-    [
-      "button(s) without an accessible name",
-      "(button-name"
-    ]
+  "description": "What the toolkit must find in evals/demo-app (a small shop with deliberately seeded defects), and what it must NOT report.",
+  "auto": [
+    "page-http-error",
+    "broken-internal-link",
+    "soft-404",
+    "link-to-missing-page",
+    "console-errors",
+    "subresource-http-error",
+    "broken-image",
+    "no-lang",
+    "seo-no-meta-description",
+    "seo-multiple-h1",
+    "mobile-horizontal-overflow",
+    "reflected-input-unencoded",
+    "form-field-no-label",
+    "email-field-wrong-type",
+    "cookie-no-httponly",
+    "placeholder-links",
+    "blank-no-noopener",
+    "login-page-cacheable",
+    "version-disclosure",
+    "missing-csp",
+    "vague-link-text",
+    "no-skip-link",
+    "seo-no-robots"
+  ],
+  "explore": [
+    "explore-empty-submit-accepted",
+    "explore-invalid-email-accepted",
+    "explore-whitespace-accepted",
+    "explore-search-case-sensitive",
+    "explore-cart-quantity-mismatch",
+    "explore-nonpositive-quantity-accepted",
+    "explore-mouse-only-control"
   ],
   "notExpected": [
-    "about.html"
+    { "rule": "mobile-horizontal-overflow", "page": "/slow", "why": "the page is judged after its late styles and content have arrived" },
+    { "rule": "no-lang", "page": "/shop", "why": "only /about lacks a language" },
+    { "rule": "explore-empty-submit-accepted", "page": "/login", "why": "login forms are never filled or submitted" }
   ]
 }
