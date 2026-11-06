@@ -11,7 +11,11 @@ export function cartNumber(line?: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
-/** Run an action and report how a counter-like line (cart, basket, items) changed. null = no counter found. */
+/**
+ * Run an action and report how a counter-like line (cart, basket, items) changed.
+ * 0 = a counter with a number was on the page and did not change (what a rejected quantity should look like).
+ * null = no counter was found at all, so there is nothing to compare.
+ */
 export async function counterDelta(page: Page, action: () => Promise<void>): Promise<number | null> {
   const before = await lines(page);
   await action();
@@ -22,7 +26,10 @@ export async function counterDelta(page: Page, action: () => Promise<void>): Pro
   const now = after.filter(l => !before.includes(l)).find(cartish);
   const was = before.filter(l => !after.includes(l)).find(cartish);
   const n = cartNumber(now);
-  return n === null ? null : n - (cartNumber(was) ?? 0);
+  if (n !== null) return n - (cartNumber(was) ?? 0);
+  // nothing changed: only call that "0" when a numbered counter really exists, not for any line that mentions "account" or "items"
+  const unchanged = before.some(l => cartish(l) && cartNumber(l) !== null && after.includes(l));
+  return unchanged ? 0 : null;
 }
 
 /** Elements that react to clicks but are not buttons or links and cannot be reached with the keyboard. */
